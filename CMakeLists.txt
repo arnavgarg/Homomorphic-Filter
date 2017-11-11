@@ -1,0 +1,6 @@
+cmake_minimum_required(VERSION 2.8)
+project(homomorphic-filters)
+find_package(OpenCV REQUIRED)
+include_directories(${OpenCV_INCLUDE_DIRS})
+add_executable(homo homo.cpp)
+target_link_libraries(homo ${OpenCV_LIBS})
