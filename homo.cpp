@@ -1,35 +1,49 @@
 #include <iostream>
 #include <cmath>
 
+#include <opencv2/core.hpp>
 #include <opencv2/imgproc.hpp>
 #include <opencv2/imgcodecs.hpp>
 #include <opencv2/highgui.hpp>
 
-#include <armadillo>
-
 int main(int argc, char* argv[])
 {
-    if (argc != 2)
-    {
+    if (argc != 2) {
         std::cout << "usage: ./homo <image_path>" << std::endl;
         return -1;
     }
     cv::Mat src = cv::imread(argv[1]);
-    if (!src.data)
-    {
+    if (!src.data) {
         std::cout << "no image data found" << std::endl;
         return -1;
     }
     cv::Mat img(src);
 
-    // convert cv::Mat to arma::mat and take ln
-    arma::mat imgmat(reinterpret_cast<double*>(img.data), img.rows, img.cols);
+    // ln
+    for (int y = 0; y < img.rows; y++)
+        for (int x = 0; x < img.cols; x++)
+            for (int c = 0; c < 3; c++)
+                img.at<cv::Vec3b>(y, x)[c] = cv::saturate_cast<uchar>(log(img.at<cv::Vec3b>(y, x)[c] + 1));
 
-    // take ln and apply fft
-    arma::cx_mat fftmat = arma::fft2(arma::log(imgmat+1));
+    // FFT
+    cv::dft(img, img);
 
+    // High-Pass Filter
+    cv::Laplacian(img, img, 0);
 
+    // inverse FFT
+    cv::idft(img, img);
 
-    // inverse ftt and exponential
-    fftmat = arma::exp10(arma::ifft2(fftmat));
+    // e^
+    for (int y = 0; y < img.rows; y++)
+        for (int x = 0; x < img.cols; x++)
+            for (int c = 0; c < 3; c++)
+                img.at<cv::Vec3b>(y, x)[c] = cv::saturate_cast<uchar>(exp(img.at<cv::Vec3b>(y, x)[c]) + 1);
+
+    cv::namedWindow("original", cv::WINDOW_AUTOSIZE);
+    cv::imshow("original", src);
+    cv::namedWindow("trans", cv::WINDOW_AUTOSIZE);
+    cv::imshow("trans", img);
+
+    cv::waitKey(0);
 }
