@@ -10,27 +10,35 @@
 void fft(cv::Mat &src, cv::Mat &dst);
 cv::Mat butterworth(cv::Mat &img, int d0, int n, int high, int low);
 
-int main(int argc, char* argv[]) {
-    if (argc != 2) {
+int main(int argc, char* argv[])
+{
+    if (argc != 2)
+    {
         std::cout << "usage: ./homo <image_path>" << std::endl;
         return -1;
     }
     cv::Mat src = cv::imread(argv[1]);
-    if (!src.data) {
+    if (!src.data)
+    {
         std::cout << "no image data found" << std::endl;
         return -1;
     }
 
     cv::Mat img;
     std::vector<cv::Mat> hlsimg;
-    if (src.channels() == 1) {
+    if (src.channels() == 1)
+    {
         img = cv::Mat(src);
-    } else if (src.channels() == 3) {
+    }
+    else if (src.channels() == 3)
+    {
         cv::Mat tmphls;
         cv::cvtColor(src, tmphls, cv::COLOR_BGR2HLS);
         cv::split(tmphls, hlsimg);
         img = hlsimg[0];
-    } else {
+    }
+    else
+    {
         return -1;
     }
 
@@ -92,15 +100,18 @@ void fft(cv::Mat &src, cv::Mat &dst)
     cv::dft(imgComplex, dst);
 }
 
-cv::Mat butterworth(cv::Mat &img, int d0, int n, int high, int low) {
+cv::Mat butterworth(cv::Mat &img, int d0, int n, int high, int low)
+{
     cv::Mat single(img.rows, img.cols, CV_32F);
     int cx = img.rows / 2;
     int cy = img.cols / 2;
     float upper = high * 0.01;
     float lower = low * 0.01;
 
-    for (int i = 0; i < img.rows; i++) {
-        for (int j = 0; j < img.cols; j++) {
+    for (int i = 0; i < img.rows; i++)
+    {
+        for (int j = 0; j < img.cols; j++)
+        {
             double radius = sqrt(pow(i - cx, 2) + pow(j - cy, 2));
             single.at<float>(i, j) = ((upper - lower) * (1 / pow(d0 / radius, 2 * n))) + lower;
         }
