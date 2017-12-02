@@ -8,7 +8,7 @@
 #include <opencv2/highgui.hpp>
 
 void fft(const cv::Mat &src, cv::Mat &dst);
-cv::Mat butterworth(cv::Mat &img, int d0, int n, int high, int low);
+cv::Mat butterworth(const cv::Mat &img, int d0, int n, int high, int low);
 
 int main(int argc, char* argv[])
 {
@@ -97,7 +97,7 @@ void fft(const cv::Mat &src, cv::Mat &dst)
     cv::dft(imgComplex, dst);
 }
 
-cv::Mat butterworth(cv::Mat &img, int d0, int n, int high, int low)
+cv::Mat butterworth(const cv::Mat &img, int d0, int n, int high, int low)
 {
     cv::Mat single(img.rows, img.cols, CV_32F);
     int cx = img.rows / 2;
