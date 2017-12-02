@@ -10,7 +10,7 @@
 void fft(const cv::Mat &src, cv::Mat &dst);
 cv::Mat butterworth(const cv::Mat &img, int d0, int n, int high, int low);
 
-int homomorphic(cv::Mat &img)
+cv::Mat homomorphic(const cv::Mat &img)
 {
     std::vector<cv::Mat> hlsimg;
     if (img.channels() == 3)
@@ -43,10 +43,12 @@ int homomorphic(cv::Mat &img)
     cv::Mat expimg;
     cv::exp(ifftimg, expimg);
 
+    cv::Mat final;
     hlsimg[0] = cv::Mat(expimg, cv::Rect(0, 0, hlsimg[1].cols, hlsimg[1].rows));
     hlsimg[0].convertTo(hlsimg[0], CV_8U);
     merge(&hlsimg[0], 3, img);
-    cv::cvtColor(img, img, cv::COLOR_HLS2BGR);
+    cv::cvtColor(img, final, cv::COLOR_HLS2BGR);
+    return final;
 }
 
 void fft(const cv::Mat &src, cv::Mat &dst)
