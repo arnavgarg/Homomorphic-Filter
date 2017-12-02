@@ -10,32 +10,17 @@
 void fft(const cv::Mat &src, cv::Mat &dst);
 cv::Mat butterworth(const cv::Mat &img, int d0, int n, int high, int low);
 
-int main(int argc, char* argv[])
+int homomorphic(cv::Mat &img)
 {
-    if (argc != 2)
-    {
-        std::cout << "usage: ./homo <image_path>" << std::endl;
-        return -1;
-    }
-    cv::Mat src = cv::imread(argv[1]);
-    if (!src.data)
-    {
-        std::cout << "no image data found" << std::endl;
-        return -1;
-    }
-
-    cv::Mat img;
     std::vector<cv::Mat> hlsimg;
-    if (src.channels() == 1)
-    {
-        img = cv::Mat(src);
-    } else if (src.channels() == 3)
+    if (img.channels() == 3)
     {
         cv::Mat tmphls;
-        cv::cvtColor(src, tmphls, cv::COLOR_BGR2HLS);
+        cv::cvtColor(img, tmphls, cv::COLOR_BGR2HLS);
         cv::split(tmphls, hlsimg);
         img = hlsimg[0];
-    } else
+    } 
+    else
     {
         return -1;
     }
@@ -57,24 +42,11 @@ int main(int argc, char* argv[])
 
     cv::Mat expimg;
     cv::exp(ifftimg, expimg);
-    cv::Mat final;
-    if (src.channels() == 3)
-    {
-        hlsimg[0] = cv::Mat(expimg, cv::Rect(0, 0, hlsimg[1].cols, hlsimg[1].rows));
-        hlsimg[0].convertTo(hlsimg[0], CV_8U);
-        merge(&hlsimg[0], 3, img);
-        cv::cvtColor(img, final, cv::COLOR_HLS2BGR);
-    }
-    else if (src.channels() == 1)
-    {
-        final = expimg.clone();
-    }
 
-    cv::namedWindow("original", cv::WINDOW_AUTOSIZE);
-    cv::namedWindow("filtered", cv::WINDOW_AUTOSIZE);
-    cv::imshow("original", src);
-    cv::imshow("filtered", final);
-    cv::waitKey(0);
+    hlsimg[0] = cv::Mat(expimg, cv::Rect(0, 0, hlsimg[1].cols, hlsimg[1].rows));
+    hlsimg[0].convertTo(hlsimg[0], CV_8U);
+    merge(&hlsimg[0], 3, img);
+    cv::cvtColor(img, img, cv::COLOR_HLS2BGR);
 }
 
 void fft(const cv::Mat &src, cv::Mat &dst)
