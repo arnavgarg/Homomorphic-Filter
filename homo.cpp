@@ -7,7 +7,7 @@
 #include <opencv2/imgcodecs.hpp>
 #include <opencv2/highgui.hpp>
 
-void fft(cv::Mat &src, cv::Mat &dst);
+void fft(const cv::Mat &src, cv::Mat &dst);
 cv::Mat butterworth(cv::Mat &img, int d0, int n, int high, int low);
 
 int main(int argc, char* argv[])
@@ -29,15 +29,13 @@ int main(int argc, char* argv[])
     if (src.channels() == 1)
     {
         img = cv::Mat(src);
-    }
-    else if (src.channels() == 3)
+    } else if (src.channels() == 3)
     {
         cv::Mat tmphls;
         cv::cvtColor(src, tmphls, cv::COLOR_BGR2HLS);
         cv::split(tmphls, hlsimg);
         img = hlsimg[0];
-    }
-    else
+    } else
     {
         return -1;
     }
@@ -49,7 +47,7 @@ int main(int argc, char* argv[])
     // apply Butterworth HPS
     cv::Mat filter = butterworth(fftimg, 10, 4, 100, 30);
     cv::Mat bimg;
-    cv::Mat bchannels[] = {cv::Mat_<float>(filter.size()), cv::Mat::zeros(filter.size(), CV_32F)};
+    cv::Mat bchannels[] = {cv::Mat_<float>(filter), cv::Mat::zeros(filter.size(), CV_32F)};
     cv::merge(bchannels, 2, bimg);
     cv::mulSpectrums(fftimg, bimg, fftimg, 0);
 
@@ -59,7 +57,6 @@ int main(int argc, char* argv[])
 
     cv::Mat expimg;
     cv::exp(ifftimg, expimg);
-    cv::imshow("test", expimg);
     cv::Mat final;
     if (src.channels() == 3)
     {
@@ -80,7 +77,7 @@ int main(int argc, char* argv[])
     cv::waitKey(0);
 }
 
-void fft(cv::Mat &src, cv::Mat &dst)
+void fft(const cv::Mat &src, cv::Mat &dst)
 {
     // convert to a 32F mat and take log
     cv::Mat logimg;
@@ -118,4 +115,3 @@ cv::Mat butterworth(cv::Mat &img, int d0, int n, int high, int low)
     }
     return single;
 }
-
