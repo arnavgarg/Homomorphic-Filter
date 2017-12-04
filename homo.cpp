@@ -1,4 +1,4 @@
-#include <iostream>
+	#include <iostream>
 #include <vector>
 #include <cmath>
 
@@ -10,21 +10,14 @@
 void fft(const cv::Mat &src, cv::Mat &dst);
 cv::Mat butterworth(const cv::Mat &img, int d0, int n, int high, int low);
 
-cv::Mat homomorphic(const cv::Mat &img)
+cv::Mat homomorphic(const cv::Mat &src)
 {
     std::vector<cv::Mat> hlsimg;
-    if (img.channels() == 3)
-    {
-        cv::Mat tmphls;
-        cv::cvtColor(img, tmphls, cv::COLOR_BGR2HLS);
-        cv::split(tmphls, hlsimg);
-        img = hlsimg[0];
-    } 
-    else
-    {
-        return -1;
-    }
-
+    cv::Mat tmphls;
+    cv::cvtColor(src, tmphls, cv::COLOR_BGR2HLS);
+    cv::split(tmphls, hlsimg);
+    cv::Mat img = hlsimg[0];
+    
     // apply FFT
     cv::Mat fftimg;
     fft(img, fftimg);
@@ -44,11 +37,20 @@ cv::Mat homomorphic(const cv::Mat &img)
     cv::exp(ifftimg, expimg);
 
     cv::Mat final;
-    hlsimg[0] = cv::Mat(expimg, cv::Rect(0, 0, hlsimg[1].cols, hlsimg[1].rows));
+    hlsimg[0] = cv::Mat(expimg, cv::Rect(0, 0, src.cols, src.rows));
     hlsimg[0].convertTo(hlsimg[0], CV_8U);
+
     merge(&hlsimg[0], 3, img);
     cv::cvtColor(img, final, cv::COLOR_HLS2BGR);
     return final;
+}
+
+int main() {
+	cv::Mat img = cv::imread("images/test1.jpg");
+	cv::imshow("original", img);
+	img = homomorphic(img);
+	cv::imshow("post", img);
+	cv::waitKey(0);
 }
 
 void fft(const cv::Mat &src, cv::Mat &dst)
