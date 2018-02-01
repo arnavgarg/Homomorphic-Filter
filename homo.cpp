@@ -1,4 +1,4 @@
-	#include <iostream>
+#include <iostream>
 #include <vector>
 #include <cmath>
 
@@ -7,8 +7,17 @@
 #include <opencv2/imgcodecs.hpp>
 #include <opencv2/highgui.hpp>
 
+cv::Mat homomorphic(const cv::Mat &src);
 void fft(const cv::Mat &src, cv::Mat &dst);
 cv::Mat butterworth(const cv::Mat &img, int d0, int n, int high, int low);
+
+int main(int argc, char** argv) {
+	cv::Mat img = cv::imread("argv[1]");
+	cv::imshow("original", img);
+	img = homomorphic(img);
+	cv::imshow("post", img);
+	cv::waitKey(0);
+}
 
 cv::Mat homomorphic(const cv::Mat &src)
 {
@@ -43,14 +52,6 @@ cv::Mat homomorphic(const cv::Mat &src)
     merge(&hlsimg[0], 3, img);
     cv::cvtColor(img, final, cv::COLOR_HLS2BGR);
     return final;
-}
-
-int main() {
-	cv::Mat img = cv::imread("images/test1.jpg");
-	cv::imshow("original", img);
-	img = homomorphic(img);
-	cv::imshow("post", img);
-	cv::waitKey(0);
 }
 
 void fft(const cv::Mat &src, cv::Mat &dst)
