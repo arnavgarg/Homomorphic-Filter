@@ -6,4 +6,4 @@ Usage:
 1. fork repo and clone
 2. `cmake .`
 3. `make`
-4. ./homo <path_to_image>
+4. `./homo <path_to_image>`
