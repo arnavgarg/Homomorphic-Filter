@@ -1,6 +1,7 @@
 #include <iostream>
 #include <vector>
 #include <cmath>
+#include <cstring>
 
 #include <opencv2/core.hpp>
 #include <opencv2/imgproc.hpp>
@@ -12,11 +13,24 @@ void fft(const cv::Mat &src, cv::Mat &dst);
 cv::Mat butterworth(const cv::Mat &img, int d0, int n, int high, int low);
 
 int main(int argc, char** argv) {
-	cv::Mat img = cv::imread("argv[1]");
-	cv::imshow("original", img);
-	img = homomorphic(img);
-	cv::imshow("post", img);
-	cv::waitKey(0);
+    if (argc == 2 && (!strcmp(argv[1], "-h") || !strcmp(argv[1], "--help"))) {
+        std::cerr << "This is a program for performing homomorphic filtering on an image."
+                  << std::endl;
+        std::cerr << "Usage: " << argv[0] << " <image path>" << std::endl;
+        return 1;
+    }
+    if (argc != 2) {
+        std::cerr << "This is a program for performing homomorphic filtering on an image."
+                  << std::endl;
+        std::cerr << "Usage: " << argv[0] << " <image path>" << std::endl;
+        return 1;
+    }
+
+    cv::Mat img = cv::imread(argv[1]);
+    cv::imshow("original", img);
+    img = homomorphic(img);
+    cv::imshow("post", img);
+    cv::waitKey(0);
 }
 
 cv::Mat homomorphic(const cv::Mat &src)
@@ -26,7 +40,7 @@ cv::Mat homomorphic(const cv::Mat &src)
     cv::cvtColor(src, tmphls, cv::COLOR_BGR2HLS);
     cv::split(tmphls, hlsimg);
     cv::Mat img = hlsimg[0];
-    
+
     // apply FFT
     cv::Mat fftimg;
     fft(img, fftimg);
